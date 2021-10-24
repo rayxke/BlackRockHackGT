@@ -2,6 +2,9 @@
 import yfinance as yf
 import pandas as pd
 import requests
+from flask import Flask, request,render_template, url_for
+
+app = Flask(__name__)
 
 #Scrape Tickers for Companies from Wikipedia
 def getticker():
@@ -15,7 +18,12 @@ def getticker():
 # Retrieve
 # Yahoo! Finance Sustainability Scores for each ticker
 #We're only doing like 10 right now because scraping is slow. :'(
-def webscrapper():
+
+def cleanData():
+    data = webScrapper()
+    return data
+
+def webScrapper():
     tickers = getticker()
     i_y = yf.Ticker('KO')
     esg_data = pd.DataFrame.transpose(i_y.sustainability)
@@ -32,9 +40,14 @@ def webscrapper():
                 esg_data = esg_data.append(temp)
         except IndexError:
             pass
+        #data = cleanData(esg_data)
+        return esg_data
 
-def main():
-    webscrapper()
+@app.route('/',methods = ['GET','POST'])
+def homepage(result=None):
+    #data = webScrapper()
+    #Need to connect data to html
+    return render_template('main.html')
 
 if __name__ == '__main__':
-    main()
+   app.run(debug=True)
